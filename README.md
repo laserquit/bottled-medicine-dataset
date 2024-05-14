@@ -1,0 +1,1 @@
+This project is the supporting code of the paper "Medicine Surface Defect Area Calculation An Integrated Approach Fusing Instance Segmentation and Perspective Transformation Based on GAM-YOLOv8-SEGMENT", and the subsequent code will be uploaded soon.
