@@ -1,0 +1,66 @@
+Mat image1;
+	double temp=0;
+	int k;//用来移动过程中计数
+	float confidence_threshold = 0.7f;
+	float nms_threshold = 0.8f;
+	auto yolo1 = yolo::load(model_path, yolo::Type::V8Seg, confidence_threshold, nms_threshold);
+	//以上是初始化yolo模型
+
+	GX_DEV_HANDLE m_hDevice;  //USB 数字摄像机句柄
+	GX_STATUS status = GX_STATUS_SUCCESS;
+	pImageBuffer = new BYTE[816 * 682 ];   // 灰度  
+	GXInitLib(); //初始化库
+	uint32_t m_nNumberDevice;
+	GXUpdateDeviceList(&m_nNumberDevice, 1000);		//获得设备个数  //如果在用户指定超时时间内成功枚举到设备，则立即返回
+	GX_DEVICE_BASE_INFO* baseinfo = new GX_DEVICE_BASE_INFO[m_nNumberDevice];
+	size_t nSize = m_nNumberDevice * sizeof(GX_DEVICE_BASE_INFO);		//获取设备信息
+	status = GXGetAllDeviceBaseInfo(baseinfo, &nSize);
+	status = GXOpenDeviceByIndex(1, &m_hDevice);		//打开数字相机，注：已经包含默认参数设
+	//status = GXOpenDeviceByIndex(2, &m_hDevice);
+
+	status = GXSetInt(m_hDevice, GX_INT_WIDTH, 816);		//设置图像宽度2048
+	status = GXSetInt(m_hDevice, GX_INT_HEIGHT, 682);		//设置图像高度1536
+	status = GXSetEnum(m_hDevice, GX_ENUM_ACQUISITION_MODE, GX_ACQ_MODE_CONTINUOUS);	//设置采集模式为连续采集
+	
+
+	status = GXSetInt(m_hDevice, GX_INT_ACQUISITION_SPEED_LEVEL, 12);	//设置采集速度，范围(0 - 12)
+
+	status = GXSetInt(m_hDevice, GX_INT_GAIN, 8);	//设置增益,增益范围(0-63)
+	status = GXSetFloat(m_hDevice, GX_FLOAT_EXPOSURE_TIME, 10000);	//曝光时间30ms
+#if IS_SNAP_SINGLE //采集单帧模式
+	cout << "single1 "<< endl;
+	while (1) {
+		if (key1 == 1) { //如果连续拍而不是用激光控制的话就注释掉这个if
+			//key = 0;
+			Mat seg;//创建空的segment图像
+			GX_FRAME_DATA frameData;
+			frameData.pImgBuf = pImageBuffer;
+			frameData.nStatus = -1;
+			//int32_t x = frameData.nPixelFormat;
+			//cout << x << endl;
+			status = GXSendCommand(m_hDevice, GX_COMMAND_ACQUISITION_START);
+			do
+			{
+				status = GXGetImage(m_hDevice, &frameData, 5);
+			} while (frameData.nStatus != 0);
+			//可对pImageBuffer 进行图像处理或者显示操作
+			Mat frame(682, 816, CV_8UC1, pImageBuffer);
+			cvtColor(frame, frame, COLOR_GRAY2RGB);
+			namedWindow("test", WINDOW_NORMAL);
+			imshow("test", frame);
+			imwrite("C:/text/2.jpg", frame);
+			waitKey(2);
+			auto objs = yolo1->forward(cvimg(frame));
+			for (auto& obj : objs)
+			{
+				if (obj.class_label == 0 && obj.seg)
+				{
+					Mat seg1(obj.seg->height, obj.seg->width, CV_8U, obj.seg->data);
+					seg1.copyTo(seg);
+					imshow("11", seg1);
+					imwrite("C:/text/1.jpg", seg1);
+					//cout << seg.rows << seg.cols << endl;
+					waitKey(2);
+				}
+
+			}
