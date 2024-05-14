@@ -1,0 +1,21 @@
+double mid;
+	for (int i = 0; i < c.rows; i++)     //构建权重矩阵
+	{
+		for (int j = 0; j < c.cols; j++)
+		{
+			if (j < 65)
+			{
+				mid = asin((64.5 - j) / 75);
+
+				c.at<float>(i, j) = 1 / cos(mid);//cout << c.at<float>(i, j) <<endl;
+				all += c.at<float>(i, j);
+}
+			else
+			{
+				mid = asin((j - 64.5) / 75);
+
+				c.at<float>(i, j) = 1 / cos(mid); // cout << c.at<float>(i, j) << endl;
+				all += c.at<float>(i, j);
+			}
+				}
+			}
