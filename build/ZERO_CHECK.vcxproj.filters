@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\laser_quit\Desktop\YOLOv8_Tensorrt-master\build\CMakeFiles\4f898cb51b2103effde95da265bc03ab\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{24223D00-B360-3EAC-944B-1B8C04A61AE5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
